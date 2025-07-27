@@ -4,28 +4,32 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
 	[Header("Movement Settings")]
-	// TODO: возможно, стоит сделать const
-	[SerializeField] private float _groundCheckRadius = 0.2f;
+	[SerializeField] private Vector2 _groundCheckArea = new Vector2(1, 1);
 
 	[Header("References")]
 	[SerializeField] private LayerMask _groundLayer;
 	[SerializeField] private Transform _groundCheck;
 
+	// [SerializeField] private float speed;
+	// [SerializeField] private float jumpForce;
 	private const float _baseSpeed = 6f;
-	private const float _baseJumpForce = 5f;
+	private const float _baseJumpForce = 7.4f;
 	public float Speed => _baseSpeed;
 	public float JumpForce => _baseJumpForce;
 
 	private Rigidbody2D _rb;
 	private SpriteRenderer _spriteRenderer;
 	private float _moveX;
-	private bool _isGrounded; // Обновляется в OnJump
-	private bool _jumpButtonHolded;
+
+	private bool _isGrounded;
+	private bool _jumpButtonPressed;
 
 	void Start()
 	{
 		_rb = GetComponent<Rigidbody2D>();
 		_spriteRenderer = GetComponent<SpriteRenderer>();
+
+		_rb.gravityScale = 1.3f;
 	}
 
 	void FixedUpdate()
@@ -33,12 +37,23 @@ public class PlayerMovement : MonoBehaviour
 		if (_moveX != 0)
 		{
 			_rb.linearVelocityX = _moveX * Speed;
-			Debug.Log($"Walking into {(_moveX > 0 ? "right" : "left")} side");
+		}
+
+		if (_jumpButtonPressed)
+		{
+			_isGrounded = Physics2D.OverlapBox(
+				_groundCheck.position,
+				_groundCheckArea, 0f,
+				_groundLayer
+			);
+
+			if (!_isGrounded)
+				return;
+
+			_rb.AddForce(Vector2.up * JumpForce, ForceMode2D.Impulse);
 		}
 	}
 
-	// Вызывается при Move, как заданно в PlayerInput
-	//InputAction.CallbackContext
 	public void OnMove(InputValue value)
 	{
 		_moveX = value.Get<Vector2>().x;
@@ -46,22 +61,9 @@ public class PlayerMovement : MonoBehaviour
 			_spriteRenderer.flipX = _moveX < 0;
 	}
 
-	// Вызывается при Jump, как заданно в PlayerInput
-	//InputAction.CallbackContext
-	public void OnJump()
+	public void OnJump(InputValue value)
 	{
-		// Перенести в FixedUpdate, если будет использоваться где-то ещё
-		_isGrounded = Physics2D.OverlapCircle(
-			_groundCheck.position,
-			_groundCheckRadius,
-			_groundLayer
-		);
-
-		if (!_isGrounded)
-			return;
-
-		_rb.AddForce(Vector2.up * JumpForce, ForceMode2D.Impulse);
-		Debug.Log($"Jumping");
+		_jumpButtonPressed = value.Get<float>() > 0;
 	}
 
 	public void OnDrawGizmos()
@@ -70,7 +72,9 @@ public class PlayerMovement : MonoBehaviour
 			return;
 
 		Gizmos.color = Color.green;
-		Gizmos.DrawWireSphere(_groundCheck.position, _groundCheckRadius);
-		// Gizmos.DrawWireCube()
+		Gizmos.DrawWireCube(
+			new Vector3(_groundCheck.position.x, _groundCheck.position.y),
+			new Vector3(_groundCheckArea.x, _groundCheckArea.y)
+		);
 	}
 }
