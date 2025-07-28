@@ -1,0 +1,9 @@
+/* Уменьшение margin-top для таблиц во всех режимах */
+.markdown-preview-view .table-wrapper {
+  margin-top: 0 !important;
+}
+
+/* Режим редактирования (Source mode) */
+.markdown-source-view .cm-embed-block[data-embed-type="table"] {
+  margin-top: 0 !important;
+}

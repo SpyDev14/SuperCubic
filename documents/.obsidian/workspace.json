@@ -27,6 +27,27 @@
             "state": {
               "type": "markdown",
               "state": {
+                "file": "Оглавление.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Оглавление"
+            }
+          }
+        ],
+        "currentTab": 1
+      },
+      {
+        "id": "71341af52daf7025",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f6aeca4fe96a051e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
                 "file": "Design document.md",
                 "mode": "source",
                 "source": false
@@ -35,8 +56,7 @@
               "title": "Design document"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -185,6 +205,11 @@
   },
   "active": "1d930d8d6f6f63ab",
   "lastOpenFiles": [
+    "Идеи.md",
+    "Оглавление.md",
+    "Design document.md",
+    "Основная идея и информация.md",
+    "design-docs",
     "media/references/props/ref-spike-1.png",
     "media/references/props/ref-spikes-1.png",
     "media/references/ref-spike-1.png",
@@ -197,12 +222,9 @@
     "media/references/levels/ref-world-animations-1.gif",
     "media/references/levels/ref-world-3.jpg",
     "media/references/levels/ref-world-2.jpg",
-    "media/references/levels/ref-world-1.png",
     "media/references/levels",
     "media/references/world",
     "Не подтверждено 949241.~",
-    "Ideas.md",
-    "Design document.md",
     "useful materials/habr.md",
     "deepseek help/dd-structure.md",
     "deepseek help/Идеи по оформлению.md",
@@ -213,7 +235,6 @@
     "deepseek help/useful materials.md",
     "deepseek help",
     "media/references/Не подтверждено 546391.~",
-    "media/references/Не подтверждено 821124.~",
     "text.txt.md",
     "Добро пожаловать.md"
   ]
