@@ -1,19 +1,20 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-	[Header("Movement Settings")]
-	[SerializeField] private Vector2 _groundCheckArea = new Vector2(1, 1);
-
 	[Header("References")]
 	[SerializeField] private LayerMask _groundLayer;
 	[SerializeField] private Transform _groundCheck;
+	[SerializeField] private Transform _leftWallCheck;
+	[SerializeField] private Transform _rightWallCheck;
 
-	// [SerializeField] private float speed;
-	// [SerializeField] private float jumpForce;
-	private const float _baseSpeed = 6f;
-	private const float _baseJumpForce = 7.4f;
+	[Header("Movement Settings")]
+	[SerializeField] private Vector2 _groundCheckArea = new Vector2(1f, 0.1f);
+	[SerializeField] private Vector2 _wallCheckArea = new Vector2(0.1f, 0.8f);
+	[SerializeField] private float _baseSpeed = 6f;
+	[SerializeField] private float _baseJumpForce = 7.4f;
 	public float Speed => _baseSpeed;
 	public float JumpForce => _baseJumpForce;
 
@@ -21,7 +22,6 @@ public class PlayerMovement : MonoBehaviour
 	private SpriteRenderer _spriteRenderer;
 	private float _moveX;
 
-	private bool _isGrounded;
 	private bool _jumpButtonPressed;
 
 	void Start()
@@ -36,23 +36,42 @@ public class PlayerMovement : MonoBehaviour
 	{
 		if (_moveX != 0)
 		{
-			_rb.linearVelocityX = _moveX * Speed;
+			bool isTryWalkInWall = (
+				(_moveX > 0 && IsTouchingRightWall()) ||
+				(_moveX < 0 && IsTouchingLeftWall())
+			);
+
+			if (!isTryWalkInWall)
+				_rb.linearVelocityX = _moveX * Speed;
 		}
 
 		if (_jumpButtonPressed)
 		{
-			_isGrounded = Physics2D.OverlapBox(
+			bool isGrounded;
+			const float correctionThreshold = 0.1f;
+
+			isGrounded = Physics2D.OverlapBox(
 				_groundCheck.position,
 				_groundCheckArea, 0f,
 				_groundLayer
-			);
+			) && Math.Abs(_rb.linearVelocityY) < correctionThreshold;
 
-			if (!_isGrounded)
-				return;
-
-			_rb.AddForce(Vector2.up * JumpForce, ForceMode2D.Impulse);
+			if (isGrounded)
+				_rb.AddForce(Vector2.up * JumpForce, ForceMode2D.Impulse);
 		}
 	}
+
+	private bool IsTouchingLeftWall() => Physics2D.OverlapBox(
+		_leftWallCheck.position,
+		_wallCheckArea, 0f,
+		_groundLayer
+	);
+
+	private bool IsTouchingRightWall() => Physics2D.OverlapBox(
+		_rightWallCheck.position,
+		_wallCheckArea, 0f,
+		_groundLayer
+	);
 
 	public void OnMove(InputValue value)
 	{
@@ -68,13 +87,26 @@ public class PlayerMovement : MonoBehaviour
 
 	public void OnDrawGizmos()
 	{
-		if (_groundCheck == null)
-			return;
 
 		Gizmos.color = Color.green;
-		Gizmos.DrawWireCube(
-			new Vector3(_groundCheck.position.x, _groundCheck.position.y),
-			new Vector3(_groundCheckArea.x, _groundCheckArea.y)
-		);
+
+		if (_groundCheck != null)
+			Gizmos.DrawWireCube(
+				new Vector3(_groundCheck.position.x, _groundCheck.position.y),
+				new Vector3(_groundCheckArea.x, _groundCheckArea.y)
+			);
+
+		// Wall checkers
+		if (_leftWallCheck != null)
+			Gizmos.DrawWireCube(
+				new Vector3(_leftWallCheck.position.x, _leftWallCheck.position.y),
+				new Vector3(_wallCheckArea.x, _wallCheckArea.y)
+			);
+
+		// if (_rightWallCheck != null)
+			Gizmos.DrawWireCube(
+				new Vector3(_rightWallCheck.position.x, _rightWallCheck.position.y),
+				new Vector3(_wallCheckArea.x, _wallCheckArea.y)
+			);
 	}
 }
